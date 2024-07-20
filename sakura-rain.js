@@ -215,16 +215,16 @@ function getRandom(option) {
   return (options[option] || options.default)();
 }
 
-function getQueryParam(param) {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(param);
+function useDefault(value, defaultValue) {
+  return value !== undefined ? value : defaultValue;
 }
 
-const maxSakura = parseInt(getQueryParam("sakura")) || 30;
-const xSpeed = parseFloat(getQueryParam("xSpeed")) || 0.5;
-const ySpeed = parseFloat(getQueryParam("ySpeed")) || 0.5;
-const rSpeed = parseFloat(getQueryParam("rSpeed")) || 0.025;
-const direction = getQueryParam("direction") || "TopRight";
-const zIndex = parseInt(getQueryParam("zIndex")) || -1;
+const config = window.sakuraConfig || {};
+const maxSakura = useDefault(parseInt(config.sakura), 30);
+const xSpeed = useDefault(parseFloat(config.xSpeed), 0.5);
+const ySpeed = useDefault(parseFloat(config.ySpeed), 0.5);
+const rSpeed = useDefault(parseFloat(config.rSpeed), 0.025);
+const direction = useDefault(config.direction, "TopRight");
+const zIndex = useDefault(parseInt(config.zIndex), -1);
 
 startSakura(maxSakura, direction, zIndex);
