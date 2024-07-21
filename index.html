@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sakura Animation Demo</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f0f0f0;
+        color: #333;
+      }
+      .control-panel {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 80%;
+        margin: 0 auto;
+      }
+      .input-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 15px;
+        border-radius: 5px;
+        background: #d3d3d3;
+        outline: none;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+      }
+
+      input[type="range"]:hover {
+        opacity: 1;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background: #ffafcc;
+        cursor: pointer;
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background: #ffafcc;
+        cursor: pointer;
+      }
+      select,
+      input[type="number"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+        height: 36px;
+      }
+      button {
+        display: block;
+        width: 100px;
+        padding: 10px;
+        background-color: #ffafcc;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+      }
+      textarea {
+        width: 100%;
+        height: 150px;
+        margin-top: 5px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: none;
+        font-family: monospace;
+        box-sizing: border-box;
+      }
+      .inline-group {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .inline-item {
+        width: 48%;
+      }
+      .inline-item select,
+      .inline-item input[type="number"] {
+        width: 100%;
+      }
+      #showButton {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: none;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="control-panel" id="controlPanel">
+      <div class="input-group">
+        <label for="sakura">花瓣數量: <span id="sakuraValue">30</span></label>
+        <input type="range" id="sakura" min="1" max="200" value="30" />
+      </div>
+      <div class="input-group">
+        <label for="xSpeed">水平速度: <span id="xSpeedValue">0.6</span></label>
+        <input
+          type="range"
+          id="xSpeed"
+          min="0"
+          max="3"
+          step="0.05"
+          value="0.5"
+        />
+      </div>
+      <div class="input-group">
+        <label for="ySpeed">垂直速度: <span id="ySpeedValue">0.5</span></label>
+        <input
+          type="range"
+          id="ySpeed"
+          min="0"
+          max="3"
+          step="0.05"
+          value="0.5"
+        />
+      </div>
+      <div class="input-group">
+        <label for="rSpeed"
+          >旋轉速度: <span id="rSpeedValue">0.025</span></label
+        >
+        <input
+          type="range"
+          id="rSpeed"
+          min="0"
+          max="0.5"
+          step="0.005"
+          value="0.025"
+        />
+      </div>
+      <div class="input-group inline-group">
+        <div class="inline-item">
+          <label for="direction">開始方向:</label>
+          <select id="direction">
+            <option value="TopRight">右上</option>
+            <option value="TopLeft">左上</option>
+            <option value="BottomRight">右下</option>
+            <option value="BottomLeft">左下</option>
+          </select>
+        </div>
+        <div class="inline-item">
+          <label for="zIndex">Z-Index:</label>
+          <input type="number" id="zIndex" value="-1" />
+        </div>
+      </div>
+      <div>
+        <textarea id="configTemplate" readonly></textarea>
+      </div>
+      <button id="hideButton">隱藏設定</button>
+    </div>
+    <button id="showButton">顯示設定</button>
+    <script>
+      window.sakuraConfig = window.sakuraConfig || {
+        sakura: 30,
+        xSpeed: 0.5,
+        ySpeed: 0.5,
+        rSpeed: 0.025,
+        direction: "TopRight",
+        zIndex: -1,
+      };
+
+      function updateConfig() {
+        window.sakuraConfig = {
+          sakura: parseInt(document.getElementById("sakura").value),
+          xSpeed: parseFloat(document.getElementById("xSpeed").value),
+          ySpeed: parseFloat(document.getElementById("ySpeed").value),
+          rSpeed: parseFloat(document.getElementById("rSpeed").value),
+          direction: document.getElementById("direction").value,
+          zIndex: parseInt(document.getElementById("zIndex").value),
+        };
+        updateConfigTemplate();
+        restartAnimation();
+      }
+
+      function updateConfigTemplate() {
+        const template = `window.sakuraConfig = ${JSON.stringify(
+          window.sakuraConfig,
+          null,
+          2
+        )};`;
+        document.getElementById("configTemplate").value = template;
+      }
+
+      function initializeInputs() {
+        for (const [key, value] of Object.entries(window.sakuraConfig)) {
+          const element = document.getElementById(key);
+          if (element) {
+            element.value = value;
+            const valueDisplay = document.getElementById(`${key}Value`);
+            if (valueDisplay) {
+              valueDisplay.textContent = value;
+            }
+            element.addEventListener("input", updateConfig);
+          }
+        }
+        updateConfigTemplate();
+      }
+
+      function loadAndExecuteScript(url) {
+        fetch(url)
+          .then((response) => response.text())
+          .then((scriptContent) => {
+            const wrappedScript = `
+                        (function() {
+                            try {
+                                ${scriptContent}
+                            } catch (e) {
+                                if (e instanceof SyntaxError && e.message.includes("Identifier 'isMobile' has already been declared")) {
+                                    console.warn("Ignored redeclaration of 'isMobile'");
+                                } else {
+                                    throw e;
+                                }
+                            }
+                        })();
+                    `;
+            const script = document.createElement("script");
+            script.textContent = wrappedScript;
+            document.body.appendChild(script);
+          })
+          .catch((error) => console.error("Error loading the script:", error));
+      }
+
+      function restartAnimation() {
+        const existingCanvas = document.querySelector("canvas");
+        if (existingCanvas) {
+          existingCanvas.remove();
+        }
+        loadAndExecuteScript("https://cdn.jsdelivr.net/gh/minz71/sakura-rain/sakura-rain.js");
+      }
+
+      document.querySelectorAll('input[type="range"]').forEach((input) => {
+        input.addEventListener("input", function () {
+          document.getElementById(`${this.id}Value`).textContent = this.value;
+        });
+      });
+      function hideControlPanel() {
+        const controlPanel = document.getElementById("controlPanel");
+        const showButton = document.getElementById("showButton");
+        if (controlPanel) controlPanel.style.display = "none";
+        if (showButton) showButton.style.display = "block";
+      }
+
+      function showControlPanel() {
+        const controlPanel = document.getElementById("controlPanel");
+        const showButton = document.getElementById("showButton");
+        if (controlPanel) controlPanel.style.display = "block";
+        if (showButton) showButton.style.display = "none";
+      }
+      function initializePage() {
+        initializeInputs();
+        restartAnimation();
+
+        const hideButton = document.getElementById("hideButton");
+        const showButton = document.getElementById("showButton");
+
+        if (hideButton) {
+          hideButton.addEventListener("click", hideControlPanel);
+        }
+
+        if (showButton) {
+          showButton.addEventListener("click", showControlPanel);
+        }
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initializePage);
+      } else {
+        initializePage();
+      }
+    </script>
+  </body>
+</html>
