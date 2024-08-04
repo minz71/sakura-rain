@@ -1,8 +1,8 @@
 # 櫻花動畫
 
 這個項目可以在網頁上創建櫻花飄落動畫。
-Demo: https://minz71.github.io/sakura-rain/
 
+Demo: https://minz71.github.io/sakura-rain/
 
 ## 功能
 - 提供櫻花飄落動畫。
@@ -31,7 +31,7 @@ startSakura(maxSakura, direction, zindex);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sakura-rain.js</title>
-  <script src="path/to/your/sakura.js"></script>
+  <script src="path/to/your/sakura-rain.js"></script>
 </head>
 <body>
   <script>
@@ -46,11 +46,11 @@ startSakura(maxSakura, direction, zindex);
 
 ||說明|預設值|傳入說明|
 |:---:|:---:|:---:|:---:|
-|sakura|櫻花花瓣的最大數量，在手機上會自動減半數量。|30|整數|
+|sakura|櫻花花瓣的最大數量，在手機上會減半數量。|30|整數|
 |xSpeed|花瓣在水平方向上的速度。|0.5|浮點數，可以大於1|
 |ySpeed|花瓣在垂直方向上的速度。|0.5|浮點數，可以大於1|
 |rSpeed|花瓣旋轉的速度。|0.025|浮點數，可以大於1|
-|direction|花瓣開始飄落的方向。TopRight指由螢幕上方或右方邊緣掉落，BottomLeft指由螢幕下方或左方邊緣掉落。當設定為下方(Bottom)時櫻花會往上飄，當設定為左方(Left)時櫻花會往右飄。|TopRight|可以是 TopRight、TopLeft、BottomRight 或 BottomLeft 之一。|
+|direction|花瓣開始飄落的方向。<br>TopRight指由螢幕上方或右方邊緣掉落，BottomLeft指由螢幕下方或左方邊緣掉落。<br>當設定為下方(Bottom)時櫻花會往上飄，當設定為左方(Left)時櫻花會往右飄。|TopRight|可以是 TopRight、TopLeft、BottomRight 或 BottomLeft 之一。|
 |zIndex|zIndex|-1||
 
 * 傳入說明
